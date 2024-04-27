@@ -27,6 +27,26 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
+    // Connect to the "insertDB" database and access its "haiku" collection
+    const artCollection = client.db("artGalleryDB").collection("artGallery");
+
+    // API Created to insert data to the database
+    app.post("/artGallery", async (req, res) => {
+      const newArtGallery = req.body;
+      console.log(newArtGallery)
+      const result = await artCollection.insertOne(newArtGallery);
+      res.send(result);
+    });
+
+
+    // read data
+    app.get("/artGallery", async (req, res) => {
+        // Execute query
+        const cursor = artCollection.find();
+        const result = await cursor.toArray();
+        res.send(result);
+      });
+
     // Connect the client to the server	(optional starting in v4.7)
     // await client.connect();
 
@@ -88,10 +108,9 @@ async function run() {
     //   res.send(result);
     // });
 
+    // Users related APIs
 
-     // Users related APIs
-
-     // read data
+    // read data
     // app.get("/user", async (req, res) => {
     //   // Execute query
     //   const cursor = userCollection.find();
@@ -107,7 +126,7 @@ async function run() {
     //   res.send(result);
     // });
 
-      // delete data
+    // delete data
     //   app.delete("/user/:id", async (req, res) => {
     //     const id = req.params.id;
     //     const query = { _id: new ObjectId(id) };
