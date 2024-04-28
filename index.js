@@ -37,8 +37,19 @@ async function run() {
     app.post("/addCraftItem", async (req, res) => {
       const newCraft = req.body;
       const result = await craftCollection.insertOne(newCraft);
+    //   console.log(result)
       res.send(result);
     });
+
+
+    /* get access the data of mongodb */
+    app.get("/allArtAndCraftItem", async(req, res) => {
+       // Execute query 
+    const cursor = craftCollection.find();
+    const result = await cursor.toArray();
+    res.send(result)
+    })
+
 
     // filter single my cart data by email
     app.get("/myArtAndCraft/:email", async (req, res) => {
