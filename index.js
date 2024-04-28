@@ -27,112 +27,60 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    // Connect to the "insertDB" database and access its "haiku" collection
-    const artCollection = client.db("artGalleryDB").collection("artGallery");
+    // Connect the client to the server	(optional starting in v4.7)
+    // await client.connect();
 
-    // API Created to insert data to the database
-    app.post("/artGallery", async (req, res) => {
-      const newArtGallery = req.body;
-      console.log(newArtGallery)
-      const result = await artCollection.insertOne(newArtGallery);
+    // db collection
+    const craftCollection = client.db("craftDB").collection("craft");
+
+    // created api to receive data from client
+    app.post("/addCraftItem", async (req, res) => {
+      const newCraft = req.body;
+      const result = await craftCollection.insertOne(newCraft);
+      res.send(result);
+    });
+
+    // filter single my cart data by email
+    app.get("/myArtAndCraft/:email", async (req, res) => {
+      // console.log(req.params.email)
+      const result = await craftCollection
+        .find({ email: req.params.email })
+        .toArray();
       res.send(result);
     });
 
 
-    // read data
-    app.get("/artGallery", async (req, res) => {
-        // Execute query
-        const cursor = artCollection.find();
-        const result = await cursor.toArray();
-        res.send(result);
+    // single item find operation
+    app.get("/singleCraft/:id", async (req, res) => {
+      // console.log(req.params.id)
+      const result = await craftCollection.findOne({
+        _id: new ObjectId(req.params.id),
       });
+      console.group(result);
+      res.send(result)
+    });
 
-    // Connect the client to the server	(optional starting in v4.7)
-    // await client.connect();
-
-    // Connect to the "insertDB" database and access its "haiku" collection
-    // const coffeeCollection = client.db("coffeeDB").collection("coffee");
-    // const userCollection = client.db('coffeeDB').collection('user')
-
-    // created api to receive data from client
-    // app.post("/coffee", async (req, res) => {
-    //   const newCoffee = req.body;
-    //   console.log(newCoffee);
-    //   const result = await coffeeCollection.insertOne(newCoffee);
-    //   res.send(result);
-    // });
-
-    // edit data
-    // app.get("/coffee/:id", async (req, res) => {
-    //   const id = req.params.id;
-    //   const query = { _id: new ObjectId(id) };
-    //   const result = await coffeeCollection.findOne(query);
-    //   res.send(result);
-    // });
-
-    // read data
-    // app.get("/coffee", async (req, res) => {
-    //   // Execute query
-    //   const cursor = coffeeCollection.find();
-    //   const result = await cursor.toArray();
-    //   res.send(result);
-    // });
-
-    // update data
-    // app.put("/coffee/:id", async (req, res) => {
-    //   const id = req.params.id;
-    //   const filter = { _id: new ObjectId(id) };
-    //   const options = { upsert: true };
-    //   const updateCoffee = req.body;
-    //   const coffee = {
-    //     $set: {
-    //       name: updateCoffee.name,
-    //       quantity: updateCoffee.quantity,
-    //       supplier: updateCoffee.supplier,
-    //       taste: updateCoffee.taste,
-    //       category: updateCoffee.category,
-    //       details: updateCoffee.details,
-    //       photo: updateCoffee.photo,
-    //     },
-    //   };
-
-    //   const result = await coffeeCollection.updateOne(filter, coffee, options);
-    //   res.send(result)
-    // });
-
-    // delete data
-    // app.delete("/coffee/:id", async (req, res) => {
-    //   const id = req.params.id;
-    //   const query = { _id: new ObjectId(id) };
-    //   const result = await coffeeCollection.deleteOne(query);
-    //   res.send(result);
-    // });
-
-    // Users related APIs
-
-    // read data
-    // app.get("/user", async (req, res) => {
-    //   // Execute query
-    //   const cursor = userCollection.find();
-    //   const result = await cursor.toArray();
-    //   res.send(result);
-    // });
-
-    // send data to database
-    //  app.post("/user", async (req, res) => {
-    //   const newUser = req.body;
-    //   console.log(newUser);
-    //   const result = await userCollection.insertOne(newUser);
-    //   res.send(result);
-    // });
-
-    // delete data
-    //   app.delete("/user/:id", async (req, res) => {
-    //     const id = req.params.id;
-    //     const query = { _id: new ObjectId(id) };
-    //     const result = await userCollection.deleteOne(query);
-    //     res.send(result);
-    //   });
+    // update
+    app.put("/updateCraft/:id", async (req, res) => {
+      console.log(req.params.id);
+      const query = { _id: new ObjectId(req.params.id) };
+      const data = {
+        $set: {
+          image: req.body.image,
+          itemName: req.body.itemName,
+          subcategoryName: req.body.subcategoryName,
+          shortDescription: req.body.shortDescription,
+          price: req.body.price,
+          rating: req.body.rating,
+          customization: req.body.customization,
+          processingTime: req.body.processingTime,
+          stockStatus: req.body.stockStatus,
+        },
+      };
+      const result = await craftCollection.updateOne(query, data);
+      console.log(result);
+      res.send(result);
+    });
 
     // Send a ping to confirm a successful connection
     // await client.db("admin").command({ ping: 1 });
@@ -148,9 +96,9 @@ run().catch(console.dir);
 // mongodb code end
 
 app.get("/", (req, res) => {
-  res.send("Art gallery server is running");
+  res.send("Craft server is running");
 });
 
 app.listen(port, () => {
-  console.log(`Art gallery Server is running on port ${port}`);
+  console.log(`Craft Server is running on port ${port}`);
 });
