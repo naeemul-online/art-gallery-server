@@ -71,6 +71,16 @@ async function run() {
       res.send(result)
     });
 
+    // single item find operation for view details
+    app.get("/allCraftViewDetails/:id", async (req, res) => {
+      // console.log(req.params.id)
+      const result = await craftCollection.findOne({
+        _id: new ObjectId(req.params.id),
+      });
+      console.group(result);
+      res.send(result)
+    });
+
     // update
     app.put("/updateCraft/:id", async (req, res) => {
       console.log(req.params.id);
