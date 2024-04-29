@@ -32,6 +32,7 @@ async function run() {
 
     // db collection
     const craftCollection = client.db("craftDB").collection("craft");
+    const categoryCollection = client.db("categoryDB").collection("category");
 
     // created api to receive data from client
     app.post("/addCraftItem", async (req, res) => {
@@ -42,6 +43,15 @@ async function run() {
     });
 
 
+    /* category section api to access the data of mongodb */
+    app.get("/categoryItem", async(req, res) => {
+       // Execute query 
+    const cursor = categoryCollection.find();
+    const result = await cursor.toArray();
+    res.send(result)
+    })
+
+    
     /* get access the data of mongodb */
     app.get("/allArtAndCraftItem", async(req, res) => {
        // Execute query 
